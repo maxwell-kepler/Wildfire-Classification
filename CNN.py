@@ -103,7 +103,19 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs=
     print(f'Training complete in {time_elapsed}')
     return model
 
+# Unfreeze layer4 for finetuning model
+def unfreeze_layer4(model):
+    for name, param in model.named_parameters():
+        if "layer4" in name:
+            param.requires_grad = True
+    print("Unfroze layer4 for fine-tuning")
 
+def get_optimizer_finetune(model):
+    # Lower learning rate for pretrained layer4
+    return optim.Adam([
+        {"params": model.model.layer4.parameters(), "lr": 1e-5},
+        {"params": model.model.fc.parameters(), "lr": 1e-4}
+    ], weight_decay=1e-5)
 
 
 # Set up paths to data directories
@@ -184,7 +196,7 @@ criterion = nn.CrossEntropyLoss()
 # Create optimizer with proper parameter groups and learning rates
 optimizer = optim.Adam(model.model.fc.parameters(), lr=0.001, weight_decay=0.01)
 
-# Learning rate scheduler
+# Learning rate scheduler: Reduce LR on Plateau
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3)
 
 # Test the data loading process
@@ -223,9 +235,33 @@ def test_model(model, test_loader):
 
 # Train and evaluate model
 try:
-    trained_model = train_model(model, dataloaders, criterion, optimizer, scheduler)
-    model.load_state_dict(torch.load('best_wildfire_model.pth'))
+    # ---- PHASE 1: Train classifier only ----
+    for param in model.parameters():
+        param.requires_grad = False  # freeze all
+    for param in model.model.fc.parameters():
+        param.requires_grad = True  # unfreeze classifier
+        
+    print("\nStarting PHASE 1: Train classifier head only")
+    trained_model = train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs=10, patience=3)
+    torch.save(trained_model.state_dict(), "best_before_fine_tuned_model.pth")
+
+
+    # ---- PHASE 2: Unfreeze layer4 (last layer before fc) to learn more features and fine-tune ----
+    print("\nStarting PHASE 2: Fine-tune layer4")
+    model.load_state_dict(torch.load("best_wildfire_model.pth"))
+    unfreeze_layer4(model)
+
+    optimizer = get_optimizer_finetune(model)
+    # Switching learning rate scheduler: Cosine Annealing 
+    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=5)
+
+    trained_model = train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs=5, patience=2)
+    torch.save(trained_model.state_dict(), "fine_tuned_model.pth")
+
+    # Evaluate final model
+    model.load_state_dict(torch.load("fine_tuned_model.pth"))
     test_model(model, dataloaders['test'])
+
 except Exception as e:
     print(f"Error during training or testing: {e}")
     traceback.print_exc()
