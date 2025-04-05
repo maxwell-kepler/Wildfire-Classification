@@ -21,4 +21,4 @@ conda activate pytorch_env
 cd /home/maxwell.kepler/TransferLearning/FinalProject
 
 # Run script
-python CNN.py
+python Wildfire_Classification.py
