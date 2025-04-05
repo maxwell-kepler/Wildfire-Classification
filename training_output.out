@@ -1,0 +1,100 @@
+Classes: ['nowildfire', 'wildfire']
+Class after mapping: {'nowildfire': 0, 'wildfire': 1}
+Training set size: 30250
+Validation set size: 6300
+Test set size: 6300
+Using device: cuda
+
+Checking data loading
+train batch shape: torch.Size([64, 3, 224, 224])
+train labels: tensor([1, 1, 1, 0, 0, 0, 0, 1, 0, 1])
+val batch shape: torch.Size([64, 3, 224, 224])
+val labels: tensor([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+test batch shape: torch.Size([64, 3, 224, 224])
+test labels: tensor([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+Data loading check complete
+
+Starting PHASE 1: Train classifier head only
+
+Epoch 1/10
+train Loss: 0.2221 Acc: 0.9121
+val Loss: 0.1449 Acc: 0.9444
+Model saved
+
+Epoch 2/10
+train Loss: 0.1948 Acc: 0.9254
+val Loss: 0.1500 Acc: 0.9421
+Early stopping counter: 1 / 3
+
+Epoch 3/10
+train Loss: 0.2034 Acc: 0.9213
+val Loss: 0.1344 Acc: 0.9500
+Model saved
+
+Epoch 4/10
+train Loss: 0.1871 Acc: 0.9296
+val Loss: 0.1278 Acc: 0.9514
+Model saved
+
+Epoch 5/10
+train Loss: 0.1957 Acc: 0.9264
+val Loss: 0.1262 Acc: 0.9530
+Model saved
+
+Epoch 6/10
+train Loss: 0.1908 Acc: 0.9274
+val Loss: 0.1677 Acc: 0.9308
+Early stopping counter: 1 / 3
+
+Epoch 7/10
+train Loss: 0.1906 Acc: 0.9272
+val Loss: 0.1259 Acc: 0.9513
+Model saved
+
+Epoch 8/10
+train Loss: 0.1919 Acc: 0.9261
+val Loss: 0.1385 Acc: 0.9492
+Early stopping counter: 1 / 3
+
+Epoch 9/10
+train Loss: 0.1975 Acc: 0.9235
+val Loss: 0.1256 Acc: 0.9511
+Model saved
+
+Epoch 10/10
+train Loss: 0.2051 Acc: 0.9182
+val Loss: 0.1237 Acc: 0.9537
+Model saved
+Training complete in 0:33:32.472052
+
+Starting PHASE 2: Fine-tune layer4
+Unfroze layer4 for fine-tuning
+
+Epoch 1/5
+train Loss: 0.1272 Acc: 0.9560
+val Loss: 0.0792 Acc: 0.9724
+Model saved
+
+Epoch 2/5
+train Loss: 0.0900 Acc: 0.9694
+val Loss: 0.0620 Acc: 0.9768
+Model saved
+
+Epoch 3/5
+train Loss: 0.0713 Acc: 0.9756
+val Loss: 0.0542 Acc: 0.9824
+Model saved
+
+Epoch 4/5
+train Loss: 0.0601 Acc: 0.9796
+val Loss: 0.0543 Acc: 0.9810
+Early stopping counter: 1 / 2
+
+Epoch 5/5
+train Loss: 0.0491 Acc: 0.9822
+val Loss: 0.0478 Acc: 0.9841
+Model saved
+Training complete in 0:17:45.338371
+
+Evaluating on test set
+Test Accuracy: 0.9883
